@@ -86,7 +86,7 @@ function updateTierButtons(){Array.from(el('tierButtons').children).forEach((b,i
 el('basic').addEventListener('click',()=>{mode='basic';el('basic').classList.add('active');el('advanced').classList.remove('active');render();});
 el('advanced').addEventListener('click',()=>{mode='advanced';el('advanced').classList.add('active');el('basic').classList.remove('active');render();});
 el('corePrice').addEventListener('input',render);el('tokens').addEventListener('change',render);
-el('includeTokenPurchase').addEventListener('change',render);el('tokenPrice').addEventListener('input',render);
+el('includeTokenPurchase').addEventListener('change',render);\nfunction updateTokenPrice(){render();}\nel('tokenPrice').addEventListener('input',updateTokenPrice);\nel('tokenPrice').addEventListener('change',updateTokenPrice);\nel('tokenPrice').addEventListener('keyup',updateTokenPrice);
 updateTierButtons();render();
 })();
 </script></body></html>
