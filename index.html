@@ -8,12 +8,12 @@
 <div class="eyebrow">Igla OTS · narzędzie społeczności</div><h1>Class 4 Forge Calculator</h1><p class="muted">Koszty Forge i Convergence Transfer od T0 do wybranego tieru.</p>
 <section class="panel">
 <label>Tryb kalkulatora</label><div class="seg"><button id="basic" class="active" type="button">Podstawowy</button><button id="advanced" type="button">Rozbudowany</button></div>
-<label>Wybierz docelowy tier</label><div class="tiers" id="tierButtons"></div>
+<label>Wybierz docelowy tier</label><div class="tiers" id="tierButtons"><button type="button" data-tier="1">T1</button><button type="button" data-tier="2">T2</button><button type="button" data-tier="3">T3</button><button type="button" data-tier="4">T4</button><button type="button" data-tier="5">T5</button><button type="button" data-tier="6">T6</button><button type="button" data-tier="7">T7</button><button type="button" data-tier="8">T8</button><button type="button" data-tier="9">T9</button><button type="button" data-tier="10">T10</button></div>
 <label for="corePrice">Cena Exalted Core (gp)</label><input id="corePrice" type="number" min="0" step="1000" value="400000">
 <label class="toggle"><input id="tokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
 <p class="note">Każdy Interim Token obniża koszt pojedynczej operacji o 250 000 gp, maksymalnie do 75% kosztu tej operacji. Koszt Exalted Core nie podlega obniżeniu.</p>
 <label class="toggle"><input id="includeTokenPurchase" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
-<div id="tokenPurchaseFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego Interim Tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="note">Ta opcja dolicza rzeczywisty wydatek na zakup wszystkich wykorzystanych tokenów. Przykład: token obniża koszt o 250 000 gp, a kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
+<div id="tokenPurchaseFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego Interim Tokena (gp)</label><input id="tokenPrice" type="text" inputmode="decimal" autocomplete="off" value="150000"><p class="note">Ta opcja dolicza rzeczywisty wydatek na zakup wszystkich wykorzystanych tokenów. Przykład: token obniża koszt o 250 000 gp, a kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
 </section>
 <section class="panel"><h2>Podsumowanie kosztów</h2><div class="grid" id="summary"></div><div id="comparison" style="margin-top:12px"></div></section>
 <section class="panel hidden" id="detailsPanel"><h2>Szczegóły obliczeń</h2><div id="details"></div></section>
@@ -31,8 +31,8 @@ function tokenCalc(cost,enabled){if(!enabled)return{net:cost,tokens:0,saving:0};
 function metric(name,value,note,extraClass){return '<div class="metric"><div class="name">'+name+'</div><div class="value '+(extraClass||'')+'">'+value+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>';}
 function render(){
  const corePrice=Math.max(0,Number(el('corePrice').value)||0),enabled=el('tokens').checked;
- const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(el('tokenPrice').value)||0);
- el('tokenPurchaseFields').classList.toggle('hidden',!includePurchase);
+ const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(String(el('tokenPrice').value).replace(/\\s/g,'').replace(',','.'))||0);
+ 
  let baseForge=0,netForge=0,coreCount=0,forgeTokens=0,forgeSaving=0,rows=[];
  for(let i=1;i<=tier;i++){
   const operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenCalc(cost,enabled);
@@ -81,16 +81,15 @@ function render(){
  '</tbody></table></div>';
  el('details').innerHTML=s;
 }
-for(let i=1;i<=10;i++){const b=document.createElement('button');b.type='button';b.textContent='T'+i;b.addEventListener('click',()=>{tier=i;updateTierButtons();render();});el('tierButtons').appendChild(b);}
-function updateTierButtons(){Array.from(el('tierButtons').children).forEach((b,i)=>b.classList.toggle('active',i+1===tier));}
+Array.from(el('tierButtons').querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{tier=Number(b.dataset.tier);updateTierButtons();render();}));
+function updateTierButtons(){Array.from(el('tierButtons').querySelectorAll('button')).forEach(b=>b.classList.toggle('active',Number(b.dataset.tier)===tier));}
 el('basic').addEventListener('click',()=>{mode='basic';el('basic').classList.add('active');el('advanced').classList.remove('active');render();});
 el('advanced').addEventListener('click',()=>{mode='advanced';el('advanced').classList.add('active');el('basic').classList.remove('active');render();});
 el('corePrice').addEventListener('input',render);el('tokens').addEventListener('change',render);
-el('includeTokenPurchase').addEventListener('change',render);
-function updateTokenPrice(){render();}
-el('tokenPrice').addEventListener('input',updateTokenPrice);
-el('tokenPrice').addEventListener('change',updateTokenPrice);
-el('tokenPrice').addEventListener('keyup',updateTokenPrice);
+el('includeTokenPurchase').addEventListener('change',()=>{el('tokenPurchaseFields').classList.toggle('hidden',!el('includeTokenPurchase').checked);render();});
+el('tokenPurchaseFields').classList.toggle('hidden',!el('includeTokenPurchase').checked);
+el('tokenPrice').addEventListener('input',render);
+el('tokenPrice').addEventListener('change',render);
 updateTierButtons();render();
 })();
 </script></body></html>
