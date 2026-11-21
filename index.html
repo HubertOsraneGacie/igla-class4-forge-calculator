@@ -31,7 +31,7 @@ function tokenCalc(cost,enabled){if(!enabled)return{net:cost,tokens:0,saving:0};
 function metric(name,value,note,extraClass){return '<div class="metric"><div class="name">'+name+'</div><div class="value '+(extraClass||'')+'">'+value+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>';}
 function render(){
  const corePrice=Math.max(0,Number(el('corePrice').value)||0),enabled=el('tokens').checked;
- const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(String(el('tokenPrice').value).replace(/\\s/g,'').replace(',','.'))||0);
+ const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(String(el('tokenPrice').value).replaceAll(' ','').replace(',','.'))||0);
  
  let baseForge=0,netForge=0,coreCount=0,forgeTokens=0,forgeSaving=0,rows=[];
  for(let i=1;i<=tier;i++){
