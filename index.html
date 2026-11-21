@@ -3,7 +3,7 @@
 <title>Igla OTS — Class 4 Forge Calculator</title>
 <style>
 :root{color-scheme:dark;--bg:#101722;--panel:#1b2635;--panel2:#243449;--text:#eef4fb;--muted:#aebdce;--line:#3b4d63;--accent:#8fc7ff;--good:#8cdbad}
-*{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,sans-serif}main{max-width:920px;margin:auto}h1{font-size:clamp(1.7rem,5vw,2.4rem);margin:4px 0}.muted,.note{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}.eyebrow{color:var(--accent);font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.seg,.tiers{display:flex;gap:8px;flex-wrap:wrap}.seg button,.tiers button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:10px 14px;font:inherit;cursor:pointer}.seg button.active,.tiers button.active{background:#315779;border-color:var(--accent)}.tiers button{min-width:48px;flex:1}label{display:block;color:var(--muted);font-size:.9rem;margin:14px 0 6px}input{width:100%;max-width:280px;background:#111b29;color:var(--text);border:1px solid #50627a;border-radius:9px;padding:11px;font:inherit}.toggle{display:flex;align-items:center;gap:9px;color:var(--text)}.toggle input{width:auto;accent-color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px;min-width:0}.metric .name{color:var(--muted);font-size:.85rem}.metric .value{font-size:1.35rem;font-weight:750;overflow-wrap:anywhere}.saving{color:var(--good)}h2{font-size:1.15rem;margin:0 0 12px}h3{font-size:1rem;margin:18px 0 8px}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}td:first-child,th:first-child{text-align:left}th{color:var(--muted);font-size:.82rem}.tablewrap{overflow-x:auto}.hidden{display:none}.note{font-size:.84rem;margin-top:12px}@media(max-width:520px){body{padding:12px}.panel{padding:14px}td,th{font-size:.8rem;padding:7px 4px}}
+*{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,sans-serif}main{max-width:920px;margin:auto}h1{font-size:clamp(1.7rem,5vw,2.4rem);margin:4px 0}.muted,.note{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}.eyebrow{color:var(--accent);font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.seg,.tiers{display:flex;gap:8px;flex-wrap:wrap}.seg button,.tiers button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:10px 14px;font:inherit;cursor:pointer}.seg button.active,.tiers button.active{background:#315779;border-color:var(--accent)}.tiers button{min-width:48px;flex:1}label{display:block;color:var(--muted);font-size:.9rem;margin:14px 0 6px}input{width:100%;max-width:280px;background:#111b29;color:var(--text);border:1px solid #50627a;border-radius:9px;padding:11px;font:inherit}.toggle{display:flex;align-items:center;gap:9px;color:var(--text)}.toggle input{width:auto;accent-color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px;min-width:0}.metric .name{color:var(--muted);font-size:.85rem}.metric .value{font-size:1.35rem;font-weight:750;overflow-wrap:anywhere}.saving{color:var(--good)}.loss{color:#ff9b9b}h2{font-size:1.15rem;margin:0 0 12px}h3{font-size:1rem;margin:18px 0 8px}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}td:first-child,th:first-child{text-align:left}th{color:var(--muted);font-size:.82rem}.tablewrap{overflow-x:auto}.hidden{display:none}.note{font-size:.84rem;margin-top:12px}@media(max-width:520px){body{padding:12px}.panel{padding:14px}td,th{font-size:.8rem;padding:7px 4px}}
 </style></head><body><main>
 <div class="eyebrow">Igla OTS · narzędzie społeczności</div><h1>Class 4 Forge Calculator</h1><p class="muted">Koszty Forge i Convergence Transfer od T0 do wybranego tieru.</p>
 <section class="panel">
@@ -12,6 +12,8 @@
 <label for="corePrice">Cena Exalted Core (gp)</label><input id="corePrice" type="number" min="0" step="1000" value="400000">
 <label class="toggle"><input id="tokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
 <p class="note">Każdy Interim Token obniża koszt pojedynczej operacji o 250 000 gp, maksymalnie do 75% kosztu tej operacji. Koszt Exalted Core nie podlega obniżeniu.</p>
+<label class="toggle"><input id="includeTokenPurchase" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
+<div id="tokenPurchaseFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego Interim Tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="note">Ta opcja dolicza rzeczywisty wydatek na zakup wszystkich wykorzystanych tokenów. Przykład: token obniża koszt o 250 000 gp, a kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
 </section>
 <section class="panel"><h2>Podsumowanie kosztów</h2><div class="grid" id="summary"></div><div id="comparison" style="margin-top:12px"></div></section>
 <section class="panel hidden" id="detailsPanel"><h2>Szczegóły obliczeń</h2><div id="details"></div></section>
@@ -26,9 +28,11 @@ const el=id=>document.getElementById(id);let tier=10,mode='basic';
 const fmt=n=>(n/1e6).toLocaleString('pl-PL',{maximumFractionDigits:3})+' kk';
 const fmtgp=n=>Math.round(n).toLocaleString('pl-PL')+' gp';
 function tokenCalc(cost,enabled){if(!enabled)return{net:cost,tokens:0,saving:0};const saving=Math.min(Math.ceil(cost*.75/250000)*250000,cost*.75);return{net:cost-saving,tokens:Math.ceil(saving/250000),saving:saving};}
-function metric(name,value,note){return '<div class="metric"><div class="name">'+name+'</div><div class="value">'+value+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>';}
+function metric(name,value,note,extraClass){return '<div class="metric"><div class="name">'+name+'</div><div class="value '+(extraClass||'')+'">'+value+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>';}
 function render(){
  const corePrice=Math.max(0,Number(el('corePrice').value)||0),enabled=el('tokens').checked;
+ const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(el('tokenPrice').value)||0);
+ el('tokenPurchaseFields').classList.toggle('hidden',!includePurchase);
  let baseForge=0,netForge=0,coreCount=0,forgeTokens=0,forgeSaving=0,rows=[];
  for(let i=1;i<=tier;i++){
   const operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenCalc(cost,enabled);
@@ -39,36 +43,42 @@ function render(){
  const coresCost=coreCount*corePrice,fullForge=baseForge+coresCost,discountForge=netForge+coresCost;
  const transferCost=transfer[tier-1],td=tokenCalc(transferCost,enabled);
  const fullTotal=fullForge+transferCost,discountTotal=discountForge+td.net,totalTokens=forgeTokens+td.tokens;
- const totalSaving=fullTotal-discountTotal;
+ const tokenPurchaseCost=includePurchase?totalTokens*tokenPrice:0;
+ const actualTotal=discountTotal+tokenPurchaseCost,tokenSaving=fullTotal-discountTotal;
+ const actualSaving=fullTotal-actualTotal;
  el('summary').innerHTML=
  metric('Forge — pełny koszt',fmt(fullForge))+
  metric('Forge — z Interim Tokens',fmt(discountForge))+
  metric('Convergence Transfer — pełny koszt',fmt(transferCost))+
  metric('Convergence Transfer — z Interim Tokens',fmt(td.net))+
  metric('Łącznie — pełny koszt',fmt(fullTotal),'Forge + Convergence Transfer')+
- metric('Łącznie — z Interim Tokens',fmt(discountTotal),'Forge + Convergence Transfer')+
- metric('Oszczędność',fmt(totalSaving),totalTokens.toLocaleString('pl-PL')+' Interim Tokens');
- el('comparison').innerHTML='<div class="metric"><div class="name">Porównanie całkowite</div><div class="value">'+fmt(fullTotal)+' → '+fmt(discountTotal)+'</div><div class="note saving">Oszczędzasz '+fmt(totalSaving)+'</div></div>';
+ metric('Łącznie — z Interim Tokens',fmt(discountTotal),'Bez kosztu zakupu tokenów')+
+ (includePurchase?metric('Koszt zakupu tokenów',fmt(tokenPurchaseCost),totalTokens.toLocaleString('pl-PL')+' × '+fmtgp(tokenPrice)): '')+
+ (includePurchase?metric('Łącznie z zakupem tokenów',fmt(actualTotal),'Rzeczywisty koszt po doliczeniu zakupu'): '')+
+ metric(includePurchase?'Realna oszczędność':'Oszczędność dzięki Interim Tokens',fmt(includePurchase?actualSaving:tokenSaving),totalTokens.toLocaleString('pl-PL')+' Interim Tokens',(includePurchase&&actualSaving<0?'loss':'saving'));
+ el('comparison').innerHTML='<div class="metric"><div class="name">'+(includePurchase?'Bilans po uwzględnieniu zakupu tokenów':'Porównanie całkowite')+'</div><div class="value">'+fmt(fullTotal)+' → '+fmt(includePurchase?actualTotal:discountTotal)+'</div><div class="note '+(includePurchase&&actualSaving<0?'loss':'saving')+'">'+(actualSaving>=0||!includePurchase?'Oszczędzasz ':'Dodatkowy koszt: ')+fmt(Math.abs(includePurchase?actualSaving:tokenSaving))+'</div></div>';
  el('detailsPanel').classList.toggle('hidden',mode!=='advanced');
  if(mode!=='advanced')return;
- let s='<h3>Forge — rozbicie operacji</h3><div class="tablewrap"><table><thead><tr><th>Tier</th><th>Operacje</th><th>Koszt / operację</th><th>Exalted Cores</th><th>Interim Tokens</th><th>Oszczędność</th></tr></thead><tbody>';
+ let s='<h3>Forge — rozbicie operacji</h3><div class="tablewrap"><table><thead><tr><th>Tier</th><th>Operacje</th><th>Koszt / operację</th><th>Exalted Cores</th><th>Interim Tokens</th><th>Obniżenie</th></tr></thead><tbody>';
  rows.forEach(r=>{s+='<tr><td>T'+r.i+'</td><td>'+r.operations.toLocaleString('pl-PL')+'</td><td>'+fmt(r.cost)+'</td><td>'+r.cores.toLocaleString('pl-PL')+'</td><td>'+r.tokens.toLocaleString('pl-PL')+'</td><td>'+fmt(r.saving)+'</td></tr>';});
  s+='</tbody></table></div><h3>Podsumowanie Forge</h3><div class="tablewrap"><table><tbody>'+
  '<tr><td>Podstawowy koszt operacji Forge</td><td>'+fmt(baseForge)+'</td></tr>'+
  '<tr><td>Exalted Cores</td><td>'+coreCount.toLocaleString('pl-PL')+' × '+fmtgp(corePrice)+' = '+fmt(coresCost)+'</td></tr>'+
  '<tr><td>Forge — pełny koszt</td><td>'+fmt(fullForge)+'</td></tr>'+
- '<tr><td>Oszczędność Forge z Interim Tokens</td><td>'+fmt(forgeSaving)+' ('+forgeTokens.toLocaleString('pl-PL')+' tokenów)</td></tr>'+
+ '<tr><td>Obniżenie Forge dzięki Interim Tokens</td><td>'+fmt(forgeSaving)+' ('+forgeTokens.toLocaleString('pl-PL')+' tokenów)</td></tr>'+
  '<tr><td>Forge — z Interim Tokens</td><td>'+fmt(discountForge)+'</td></tr></tbody></table></div>'+
  '<h3>Convergence Transfer — T'+tier+'</h3><div class="tablewrap"><table><tbody>'+
  '<tr><td>Pełny koszt transferu</td><td>'+fmt(transferCost)+'</td></tr>'+
  '<tr><td>Interim Tokens</td><td>'+td.tokens.toLocaleString('pl-PL')+'</td></tr>'+
- '<tr><td>Oszczędność</td><td>'+fmt(td.saving)+'</td></tr>'+
+ '<tr><td>Obniżenie</td><td>'+fmt(td.saving)+'</td></tr>'+
  '<tr><td>Transfer — z Interim Tokens</td><td>'+fmt(td.net)+'</td></tr></tbody></table></div>'+
  '<h3>Łącznie</h3><div class="tablewrap"><table><tbody>'+
  '<tr><td>Forge + Transfer — pełny koszt</td><td>'+fmt(fullTotal)+'</td></tr>'+
  '<tr><td>Forge + Transfer — z Interim Tokens</td><td>'+fmt(discountTotal)+'</td></tr>'+
- '<tr><td>Łączna oszczędność</td><td class="saving">'+fmt(totalSaving)+'</td></tr>'+
- '<tr><td>Łączna liczba Interim Tokens</td><td>'+totalTokens.toLocaleString('pl-PL')+'</td></tr></tbody></table></div>';
+ '<tr><td>Łączne obniżenie kosztu</td><td>'+fmt(tokenSaving)+'</td></tr>'+
+ '<tr><td>Łączna liczba Interim Tokens</td><td>'+totalTokens.toLocaleString('pl-PL')+'</td></tr>'+
+ (includePurchase?'<tr><td>Koszt zakupu tokenów</td><td>'+totalTokens.toLocaleString('pl-PL')+' × '+fmtgp(tokenPrice)+' = '+fmt(tokenPurchaseCost)+'</td></tr><tr><td>Łączny koszt z zakupem tokenów</td><td>'+fmt(actualTotal)+'</td></tr><tr><td>Realna oszczędność po zakupie</td><td class="'+(actualSaving<0?'loss':'saving')+'">'+fmt(actualSaving)+'</td></tr>':'')+
+ '</tbody></table></div>';
  el('details').innerHTML=s;
 }
 for(let i=1;i<=10;i++){const b=document.createElement('button');b.type='button';b.textContent='T'+i;b.addEventListener('click',()=>{tier=i;updateTierButtons();render();});el('tierButtons').appendChild(b);}
@@ -76,6 +86,7 @@ function updateTierButtons(){Array.from(el('tierButtons').children).forEach((b,i
 el('basic').addEventListener('click',()=>{mode='basic';el('basic').classList.add('active');el('advanced').classList.remove('active');render();});
 el('advanced').addEventListener('click',()=>{mode='advanced';el('advanced').classList.add('active');el('basic').classList.remove('active');render();});
 el('corePrice').addEventListener('input',render);el('tokens').addEventListener('change',render);
+el('includeTokenPurchase').addEventListener('change',render);el('tokenPrice').addEventListener('input',render);
 updateTierButtons();render();
 })();
 </script></body></html>
