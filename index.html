@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:right;padding:8px 5px
 <label class="check"><input id="useTokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
 <p class="hint">Token obniża koszt operacji o 250 000 gp, maksymalnie o 75% jej kosztu. Koszt Exalted Core nie jest obniżany.</p>
 <label class="check"><input id="buyTokens" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
-<div id="buyFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="hint">Np. token kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
+<div id="buyFields" class="hidden"><label for="tokenQty">Ile Interim Tokens kupiłem?</label><input id="tokenQty" type="number" min="0" step="1" value="0"><label for="tokenPrice">Cena zakupu jednego tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="hint">Pozostałe potrzebne tokeny traktowane są jako posiadane za darmo. Każdy token obniża koszt o 250 000 gp (z limitem 75% kosztu operacji).</p></div>
 </section>
 <section><h2>Podsumowanie</h2><div class="grid" id="summary"></div></section>
 <section id="detailSection" class="hidden"><h2>Szczegóły obliczeń</h2><div id="details"></div></section>
@@ -66,7 +66,7 @@ function render(){
  var corePrice=Math.max(0,Number(byId('core').value)||0);
  var useTokens=byId('useTokens').checked;
  var buy=byId('buyTokens').checked;
- var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);
+ var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);\n var purchasedTokens=Math.max(0,Math.floor(Number(byId('tokenQty').value)||0));
  var forgeGross=0,forgeNet=0,cores=0,forgeTokenCount=0,forgeDiscount=0,rows=[];
  for(var i=1;i<=tier;i++){
   var operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenDiscount(cost,useTokens);
@@ -91,7 +91,7 @@ function render(){
  html+=card('Łącznie — pełny koszt',money(fullTotal));
  html+=card('Łącznie — z Interim Tokens',money(afterTokens),'Bez ceny zakupu tokenów');
  if(buy){
-  html+=card('Koszt zakupu tokenów',money(purchaseCost),tokenCount.toLocaleString('pl-PL')+' × '+gp(tokenPrice));
+  html+=card('Kupione tokeny',paidTokenCount.toLocaleString('pl-PL'),'z '+tokenCount.toLocaleString('pl-PL')+' potrzebnych');\n  html+=card('Darmowe tokeny',freeTokenCount.toLocaleString('pl-PL'));\n  html+=card('Koszt zakupu tokenów',money(purchaseCost),paidTokenCount.toLocaleString('pl-PL')+' × '+gp(tokenPrice));
   html+=card('Łącznie z zakupem tokenów',money(actualTotal));
   html+=card('Realna oszczędność',money(realSaving),tokenCount.toLocaleString('pl-PL')+' tokenów',realSaving>=0?'good':'bad');
  }else{
@@ -111,7 +111,7 @@ function render(){
  s+='<tr><td>Liczba Interim Tokens</td><td>'+tokenCount+'</td></tr>';
  s+='<tr><td>Łącznie — pełny koszt</td><td>'+money(fullTotal)+'</td></tr>';
  s+='<tr><td>Łącznie — z Interim Tokens</td><td>'+money(afterTokens)+'</td></tr>';
- if(buy){s+='<tr><td>Koszt zakupu tokenów</td><td>'+money(purchaseCost)+'</td></tr><tr><td>Łącznie z zakupem tokenów</td><td>'+money(actualTotal)+'</td></tr><tr><td>Realna oszczędność</td><td>'+money(realSaving)+'</td></tr>';}
+ if(buy){s+='<tr><td>Kupione tokeny</td><td>'+paidTokenCount+' z '+tokenCount+'</td></tr><tr><td>Darmowe tokeny</td><td>'+freeTokenCount+'</td></tr><tr><td>Koszt zakupu tokenów</td><td>'+money(purchaseCost)+'</td></tr><tr><td>Łącznie z zakupem tokenów</td><td>'+money(actualTotal)+'</td></tr><tr><td>Realna oszczędność</td><td>'+money(realSaving)+'</td></tr>';}
  s+='</tbody></table></div>';
  byId('details').innerHTML=s;
 }
@@ -124,7 +124,7 @@ Array.prototype.forEach.call(byId('tiers').querySelectorAll('button'),function(b
 });
 byId('basic').addEventListener('click',function(){mode='basic';byId('basic').classList.add('active');byId('advanced').classList.remove('active');render();});
 byId('advanced').addEventListener('click',function(){mode='advanced';byId('advanced').classList.add('active');byId('basic').classList.remove('active');render();});
-['core','useTokens','buyTokens','tokenPrice'].forEach(function(id){byId(id).addEventListener('input',render);byId(id).addEventListener('change',render);});
+['core','useTokens','buyTokens','tokenPrice','tokenQty'].forEach(function(id){byId(id).addEventListener('input',render);byId(id).addEventListener('change',render);});
 byId('buyTokens').addEventListener('change',function(){byId('buyFields').classList.toggle('hidden',!byId('buyTokens').checked);});
 byId('tiers').querySelector('[data-tier="10"]').classList.add('active');
 render();
