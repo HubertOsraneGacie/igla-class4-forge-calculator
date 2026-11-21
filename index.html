@@ -1,95 +1,133 @@
 <!doctype html>
-<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Igla OTS — Class 4 Forge Calculator</title>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 4 Forge Calculator</title>
 <style>
-:root{color-scheme:dark;--bg:#101722;--panel:#1b2635;--panel2:#243449;--text:#eef4fb;--muted:#aebdce;--line:#3b4d63;--accent:#8fc7ff;--good:#8cdbad}
-*{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,sans-serif}main{max-width:920px;margin:auto}h1{font-size:clamp(1.7rem,5vw,2.4rem);margin:4px 0}.muted,.note{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}.eyebrow{color:var(--accent);font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.seg,.tiers{display:flex;gap:8px;flex-wrap:wrap}.seg button,.tiers button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:10px 14px;font:inherit;cursor:pointer}.seg button.active,.tiers button.active{background:#315779;border-color:var(--accent)}.tiers button{min-width:48px;flex:1}label{display:block;color:var(--muted);font-size:.9rem;margin:14px 0 6px}input{width:100%;max-width:280px;background:#111b29;color:var(--text);border:1px solid #50627a;border-radius:9px;padding:11px;font:inherit}.toggle{display:flex;align-items:center;gap:9px;color:var(--text)}.toggle input{width:auto;accent-color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px;min-width:0}.metric .name{color:var(--muted);font-size:.85rem}.metric .value{font-size:1.35rem;font-weight:750;overflow-wrap:anywhere}.saving{color:var(--good)}.loss{color:#ff9b9b}h2{font-size:1.15rem;margin:0 0 12px}h3{font-size:1rem;margin:18px 0 8px}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}td:first-child,th:first-child{text-align:left}th{color:var(--muted);font-size:.82rem}.tablewrap{overflow-x:auto}.hidden{display:none}.note{font-size:.84rem;margin-top:12px}@media(max-width:520px){body{padding:12px}.panel{padding:14px}td,th{font-size:.8rem;padding:7px 4px}}
-</style></head><body><main>
-<div class="eyebrow">Igla OTS · narzędzie społeczności</div><h1>Class 4 Forge Calculator</h1><p class="muted">Koszty Forge i Convergence Transfer od T0 do wybranego tieru.</p>
-<section class="panel">
-<label>Tryb kalkulatora</label><div class="seg"><button id="basic" class="active" type="button">Podstawowy</button><button id="advanced" type="button">Rozbudowany</button></div>
-<label>Wybierz docelowy tier</label><div class="tiers" id="tierButtons"><button type="button" data-tier="1">T1</button><button type="button" data-tier="2">T2</button><button type="button" data-tier="3">T3</button><button type="button" data-tier="4">T4</button><button type="button" data-tier="5">T5</button><button type="button" data-tier="6">T6</button><button type="button" data-tier="7">T7</button><button type="button" data-tier="8">T8</button><button type="button" data-tier="9">T9</button><button type="button" data-tier="10">T10</button></div>
-<label for="corePrice">Cena Exalted Core (gp)</label><input id="corePrice" type="number" min="0" step="1000" value="400000">
-<label class="toggle"><input id="tokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
-<p class="note">Każdy Interim Token obniża koszt pojedynczej operacji o 250 000 gp, maksymalnie do 75% kosztu tej operacji. Koszt Exalted Core nie podlega obniżeniu.</p>
-<label class="toggle"><input id="includeTokenPurchase" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
-<div id="tokenPurchaseFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego Interim Tokena (gp)</label><input id="tokenPrice" type="text" inputmode="decimal" autocomplete="off" value="150000"><p class="note">Ta opcja dolicza rzeczywisty wydatek na zakup wszystkich wykorzystanych tokenów. Przykład: token obniża koszt o 250 000 gp, a kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101722;color:#eef4fb}
+*{box-sizing:border-box}body{margin:0;padding:16px}main{max-width:900px;margin:auto}
+section{background:#1b2635;border:1px solid #3b4d63;border-radius:14px;padding:16px;margin:14px 0}
+h1{font-size:1.8rem;margin:4px 0 8px}h2{font-size:1.15rem;margin:0 0 12px}
+p,.hint{color:#aebdce;font-size:.9rem}
+label{display:block;margin:12px 0 6px;color:#c5d2e0}
+input{font:inherit;font-size:16px;padding:11px;border:1px solid #60748d;border-radius:8px;background:#101722;color:#fff;width:100%;max-width:320px}
+.check{display:flex;gap:9px;align-items:center}.check input{width:auto}
+button{font:inherit;color:#eef4fb;background:#243449;border:1px solid #50647c;border-radius:8px;padding:10px 13px;cursor:pointer}
+button.active{background:#315779;border-color:#8fc7ff}
+.tiers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.modes{display:flex;gap:8px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px}
+.metric{background:#243449;border-radius:9px;padding:12px;min-width:0}
+.metric small{display:block;color:#b9c8d8}.metric strong{font-size:1.25rem;overflow-wrap:anywhere;display:block;margin-top:3px}
+.good{color:#8cdbad}.bad{color:#ff9b9b}.hidden{display:none}
+table{width:100%;border-collapse:collapse}td,th{text-align:right;padding:8px 5px;border-bottom:1px solid #3b4d63}td:first-child,th:first-child{text-align:left}th{color:#aebdce}
+.scroll{overflow-x:auto}
+@media(min-width:600px){.tiers{grid-template-columns:repeat(10,1fr)}}
+</style>
+</head>
+<body><main>
+<p>IGLA OTS · NARZĘDZIE SPOŁECZNOŚCI</p>
+<h1>Class 4 Forge Calculator</h1>
+<p>Koszt Forge i Convergence Transfer od T0 do wybranego tieru.</p>
+<section>
+<label>Tryb</label><div class="modes"><button id="basic" class="active" type="button">Podstawowy</button><button id="advanced" type="button">Rozbudowany</button></div>
+<label>Docelowy tier</label>
+<div class="tiers" id="tiers">
+<button type="button" data-tier="1">T1</button><button type="button" data-tier="2">T2</button><button type="button" data-tier="3">T3</button><button type="button" data-tier="4">T4</button><button type="button" data-tier="5">T5</button><button type="button" data-tier="6">T6</button><button type="button" data-tier="7">T7</button><button type="button" data-tier="8">T8</button><button type="button" data-tier="9">T9</button><button type="button" data-tier="10">T10</button>
+</div>
+<label for="core">Cena Exalted Core (gp)</label><input id="core" type="number" min="0" step="1000" value="400000">
+<label class="check"><input id="useTokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
+<p class="hint">Token obniża koszt operacji o 250 000 gp, maksymalnie o 75% jej kosztu. Koszt Exalted Core nie jest obniżany.</p>
+<label class="check"><input id="buyTokens" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
+<div id="buyFields" class="hidden"><label for="tokenPrice">Cena zakupu jednego tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="hint">Np. token kupiony za 150 000 gp daje 100 000 gp realnej oszczędności.</p></div>
 </section>
-<section class="panel"><h2>Podsumowanie kosztów</h2><div class="grid" id="summary"></div><div id="comparison" style="margin-top:12px"></div></section>
-<section class="panel hidden" id="detailsPanel"><h2>Szczegóły obliczeń</h2><div id="details"></div></section>
-<p class="note">1 kk = 1 000 000 gp. Wyniki bazują na tabelach kosztów przyjętych w kalkulatorze.</p>
+<section><h2>Podsumowanie</h2><div class="grid" id="summary"></div></section>
+<section id="detailSection" class="hidden"><h2>Szczegóły obliczeń</h2><div id="details"></div></section>
+<p class="hint">1 kk = 1 000 000 gp.</p>
 </main>
 <script>
 (function(){
-'use strict';
-const fusion=[1500000,3000000,6000000,15000000,20000000,26000000,45000000,60000000,80000000,100000000];
-const transfer=[12000000,24000000,45000000,60000000,78000000,135000000,180000000,240000000,300000000,500000000];
-const el=id=>document.getElementById(id);let tier=10,mode='basic';
-const fmt=n=>(n/1e6).toLocaleString('pl-PL',{maximumFractionDigits:3})+' kk';
-const fmtgp=n=>Math.round(n).toLocaleString('pl-PL')+' gp';
-function tokenCalc(cost,enabled){if(!enabled)return{net:cost,tokens:0,saving:0};const saving=Math.min(Math.ceil(cost*.75/250000)*250000,cost*.75);return{net:cost-saving,tokens:Math.ceil(saving/250000),saving:saving};}
-function metric(name,value,note,extraClass){return '<div class="metric"><div class="name">'+name+'</div><div class="value '+(extraClass||'')+'">'+value+'</div>'+(note?'<div class="note">'+note+'</div>':'')+'</div>';}
-function render(){
- const corePrice=Math.max(0,Number(el('corePrice').value)||0),enabled=el('tokens').checked;
- const includePurchase=el('includeTokenPurchase').checked,tokenPrice=Math.max(0,Number(String(el('tokenPrice').value).replaceAll(' ','').replace(',','.'))||0);
- 
- let baseForge=0,netForge=0,coreCount=0,forgeTokens=0,forgeSaving=0,rows=[];
- for(let i=1;i<=tier;i++){
-  const operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenCalc(cost,enabled);
-  const cores=operations*(i===1?1:2),gross=operations*cost,net=operations*d.net;
-  baseForge+=gross;netForge+=net;coreCount+=cores;forgeTokens+=operations*d.tokens;forgeSaving+=operations*d.saving;
-  rows.push({i,operations,cost,cores,tokens:operations*d.tokens,saving:operations*d.saving});
- }
- const coresCost=coreCount*corePrice,fullForge=baseForge+coresCost,discountForge=netForge+coresCost;
- const transferCost=transfer[tier-1],td=tokenCalc(transferCost,enabled);
- const fullTotal=fullForge+transferCost,discountTotal=discountForge+td.net,totalTokens=forgeTokens+td.tokens;
- const tokenPurchaseCost=includePurchase?totalTokens*tokenPrice:0;
- const actualTotal=discountTotal+tokenPurchaseCost,tokenSaving=fullTotal-discountTotal;
- const actualSaving=fullTotal-actualTotal;
- el('summary').innerHTML=
- metric('Forge — pełny koszt',fmt(fullForge))+
- metric('Forge — z Interim Tokens',fmt(discountForge))+
- metric('Convergence Transfer — pełny koszt',fmt(transferCost))+
- metric('Convergence Transfer — z Interim Tokens',fmt(td.net))+
- metric('Łącznie — pełny koszt',fmt(fullTotal),'Forge + Convergence Transfer')+
- metric('Łącznie — z Interim Tokens',fmt(discountTotal),'Bez kosztu zakupu tokenów')+
- (includePurchase?metric('Koszt zakupu tokenów',fmt(tokenPurchaseCost),totalTokens.toLocaleString('pl-PL')+' × '+fmtgp(tokenPrice)): '')+
- (includePurchase?metric('Łącznie z zakupem tokenów',fmt(actualTotal),'Rzeczywisty koszt po doliczeniu zakupu'): '')+
- metric(includePurchase?'Realna oszczędność':'Oszczędność dzięki Interim Tokens',fmt(includePurchase?actualSaving:tokenSaving),totalTokens.toLocaleString('pl-PL')+' Interim Tokens',(includePurchase&&actualSaving<0?'loss':'saving'));
- el('comparison').innerHTML='<div class="metric"><div class="name">'+(includePurchase?'Bilans po uwzględnieniu zakupu tokenów':'Porównanie całkowite')+'</div><div class="value">'+fmt(fullTotal)+' → '+fmt(includePurchase?actualTotal:discountTotal)+'</div><div class="note '+(includePurchase&&actualSaving<0?'loss':'saving')+'">'+(actualSaving>=0||!includePurchase?'Oszczędzasz ':'Dodatkowy koszt: ')+fmt(Math.abs(includePurchase?actualSaving:tokenSaving))+'</div></div>';
- el('detailsPanel').classList.toggle('hidden',mode!=='advanced');
- if(mode!=='advanced')return;
- let s='<h3>Forge — rozbicie operacji</h3><div class="tablewrap"><table><thead><tr><th>Tier</th><th>Operacje</th><th>Koszt / operację</th><th>Exalted Cores</th><th>Interim Tokens</th><th>Obniżenie</th></tr></thead><tbody>';
- rows.forEach(r=>{s+='<tr><td>T'+r.i+'</td><td>'+r.operations.toLocaleString('pl-PL')+'</td><td>'+fmt(r.cost)+'</td><td>'+r.cores.toLocaleString('pl-PL')+'</td><td>'+r.tokens.toLocaleString('pl-PL')+'</td><td>'+fmt(r.saving)+'</td></tr>';});
- s+='</tbody></table></div><h3>Podsumowanie Forge</h3><div class="tablewrap"><table><tbody>'+
- '<tr><td>Podstawowy koszt operacji Forge</td><td>'+fmt(baseForge)+'</td></tr>'+
- '<tr><td>Exalted Cores</td><td>'+coreCount.toLocaleString('pl-PL')+' × '+fmtgp(corePrice)+' = '+fmt(coresCost)+'</td></tr>'+
- '<tr><td>Forge — pełny koszt</td><td>'+fmt(fullForge)+'</td></tr>'+
- '<tr><td>Obniżenie Forge dzięki Interim Tokens</td><td>'+fmt(forgeSaving)+' ('+forgeTokens.toLocaleString('pl-PL')+' tokenów)</td></tr>'+
- '<tr><td>Forge — z Interim Tokens</td><td>'+fmt(discountForge)+'</td></tr></tbody></table></div>'+
- '<h3>Convergence Transfer — T'+tier+'</h3><div class="tablewrap"><table><tbody>'+
- '<tr><td>Pełny koszt transferu</td><td>'+fmt(transferCost)+'</td></tr>'+
- '<tr><td>Interim Tokens</td><td>'+td.tokens.toLocaleString('pl-PL')+'</td></tr>'+
- '<tr><td>Obniżenie</td><td>'+fmt(td.saving)+'</td></tr>'+
- '<tr><td>Transfer — z Interim Tokens</td><td>'+fmt(td.net)+'</td></tr></tbody></table></div>'+
- '<h3>Łącznie</h3><div class="tablewrap"><table><tbody>'+
- '<tr><td>Forge + Transfer — pełny koszt</td><td>'+fmt(fullTotal)+'</td></tr>'+
- '<tr><td>Forge + Transfer — z Interim Tokens</td><td>'+fmt(discountTotal)+'</td></tr>'+
- '<tr><td>Łączne obniżenie kosztu</td><td>'+fmt(tokenSaving)+'</td></tr>'+
- '<tr><td>Łączna liczba Interim Tokens</td><td>'+totalTokens.toLocaleString('pl-PL')+'</td></tr>'+
- (includePurchase?'<tr><td>Koszt zakupu tokenów</td><td>'+totalTokens.toLocaleString('pl-PL')+' × '+fmtgp(tokenPrice)+' = '+fmt(tokenPurchaseCost)+'</td></tr><tr><td>Łączny koszt z zakupem tokenów</td><td>'+fmt(actualTotal)+'</td></tr><tr><td>Realna oszczędność po zakupie</td><td class="'+(actualSaving<0?'loss':'saving')+'">'+fmt(actualSaving)+'</td></tr>':'')+
- '</tbody></table></div>';
- el('details').innerHTML=s;
+var fusion=[1500000,3000000,6000000,15000000,20000000,26000000,45000000,60000000,80000000,100000000];
+var transfer=[12000000,24000000,45000000,60000000,78000000,135000000,180000000,240000000,300000000,500000000];
+var tier=10,mode='basic';
+function byId(id){return document.getElementById(id);}
+function money(n){return (n/1000000).toLocaleString('pl-PL',{maximumFractionDigits:3})+' kk';}
+function gp(n){return Math.round(n).toLocaleString('pl-PL')+' gp';}
+function tokenDiscount(cost,enabled){
+ if(!enabled)return {net:cost,count:0,discount:0};
+ var discount=Math.min(Math.ceil((cost*0.75)/250000)*250000,cost*0.75);
+ return {net:cost-discount,count:Math.ceil(discount/250000),discount:discount};
 }
-Array.from(el('tierButtons').querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{tier=Number(b.dataset.tier);updateTierButtons();render();}));
-function updateTierButtons(){Array.from(el('tierButtons').querySelectorAll('button')).forEach(b=>b.classList.toggle('active',Number(b.dataset.tier)===tier));}
-el('basic').addEventListener('click',()=>{mode='basic';el('basic').classList.add('active');el('advanced').classList.remove('active');render();});
-el('advanced').addEventListener('click',()=>{mode='advanced';el('advanced').classList.add('active');el('basic').classList.remove('active');render();});
-el('corePrice').addEventListener('input',render);el('tokens').addEventListener('change',render);
-el('includeTokenPurchase').addEventListener('change',()=>{el('tokenPurchaseFields').classList.toggle('hidden',!el('includeTokenPurchase').checked);render();});
-el('tokenPurchaseFields').classList.toggle('hidden',!el('includeTokenPurchase').checked);
-el('tokenPrice').addEventListener('input',render);
-el('tokenPrice').addEventListener('change',render);
-updateTierButtons();render();
+function card(title,value,sub,cls){
+ return '<div class="metric"><small>'+title+'</small><strong class="'+(cls||'')+'">'+value+'</strong>'+(sub?'<small>'+sub+'</small>':'')+'</div>';
+}
+function render(){
+ var corePrice=Math.max(0,Number(byId('core').value)||0);
+ var useTokens=byId('useTokens').checked;
+ var buy=byId('buyTokens').checked;
+ var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);
+ var forgeGross=0,forgeNet=0,cores=0,forgeTokenCount=0,forgeDiscount=0,rows=[];
+ for(var i=1;i<=tier;i++){
+  var operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenDiscount(cost,useTokens);
+  var coreQty=operations*(i===1?1:2);
+  forgeGross+=operations*cost;forgeNet+=operations*d.net;cores+=coreQty;
+  forgeTokenCount+=operations*d.count;forgeDiscount+=operations*d.discount;
+  rows.push({tier:i,operations:operations,cost:cost,cores:coreQty,tokens:operations*d.count,discount:operations*d.discount});
+ }
+ var coreCost=cores*corePrice;
+ var forgeFull=forgeGross+coreCost,forgeAfter=forgeNet+coreCost;
+ var transferFull=transfer[tier-1],td=tokenDiscount(transferFull,useTokens);
+ var fullTotal=forgeFull+transferFull,afterTokens=forgeAfter+td.net;
+ var tokenCount=forgeTokenCount+td.count,discountTotal=fullTotal-afterTokens;
+ var purchaseCost=buy?tokenCount*tokenPrice:0;
+ var actualTotal=afterTokens+purchaseCost,realSaving=fullTotal-actualTotal;
+ byId('buyFields').classList.toggle('hidden',!buy);
+ var html='';
+ html+=card('Forge — pełny koszt',money(forgeFull));
+ html+=card('Forge — z Interim Tokens',money(forgeAfter));
+ html+=card('Convergence Transfer — pełny koszt',money(transferFull));
+ html+=card('Convergence Transfer — z Interim Tokens',money(td.net));
+ html+=card('Łącznie — pełny koszt',money(fullTotal));
+ html+=card('Łącznie — z Interim Tokens',money(afterTokens),'Bez ceny zakupu tokenów');
+ if(buy){
+  html+=card('Koszt zakupu tokenów',money(purchaseCost),tokenCount.toLocaleString('pl-PL')+' × '+gp(tokenPrice));
+  html+=card('Łącznie z zakupem tokenów',money(actualTotal));
+  html+=card('Realna oszczędność',money(realSaving),tokenCount.toLocaleString('pl-PL')+' tokenów',realSaving>=0?'good':'bad');
+ }else{
+  html+=card('Oszczędność dzięki Interim Tokens',money(discountTotal),tokenCount.toLocaleString('pl-PL')+' tokenów','good');
+ }
+ byId('summary').innerHTML=html;
+ byId('detailSection').classList.toggle('hidden',mode!=='advanced');
+ if(mode!=='advanced')return;
+ var s='<h3>Forge — operacje</h3><div class="scroll"><table><thead><tr><th>Tier</th><th>Operacje</th><th>Koszt / operację</th><th>Cores</th><th>Tokens</th><th>Obniżenie</th></tr></thead><tbody>';
+ rows.forEach(function(r){s+='<tr><td>T'+r.tier+'</td><td>'+r.operations+'</td><td>'+money(r.cost)+'</td><td>'+r.cores+'</td><td>'+r.tokens+'</td><td>'+money(r.discount)+'</td></tr>';});
+ s+='</tbody></table></div><h3>Podsumowanie całkowite</h3><div class="scroll"><table><tbody>';
+ s+='<tr><td>Exalted Cores</td><td>'+cores+' × '+gp(corePrice)+' = '+money(coreCost)+'</td></tr>';
+ s+='<tr><td>Forge — pełny koszt</td><td>'+money(forgeFull)+'</td></tr>';
+ s+='<tr><td>Forge — z Interim Tokens</td><td>'+money(forgeAfter)+'</td></tr>';
+ s+='<tr><td>Transfer — pełny koszt</td><td>'+money(transferFull)+'</td></tr>';
+ s+='<tr><td>Transfer — z Interim Tokens</td><td>'+money(td.net)+'</td></tr>';
+ s+='<tr><td>Liczba Interim Tokens</td><td>'+tokenCount+'</td></tr>';
+ s+='<tr><td>Łącznie — pełny koszt</td><td>'+money(fullTotal)+'</td></tr>';
+ s+='<tr><td>Łącznie — z Interim Tokens</td><td>'+money(afterTokens)+'</td></tr>';
+ if(buy){s+='<tr><td>Koszt zakupu tokenów</td><td>'+money(purchaseCost)+'</td></tr><tr><td>Łącznie z zakupem tokenów</td><td>'+money(actualTotal)+'</td></tr><tr><td>Realna oszczędność</td><td>'+money(realSaving)+'</td></tr>';}
+ s+='</tbody></table></div>';
+ byId('details').innerHTML=s;
+}
+Array.prototype.forEach.call(byId('tiers').querySelectorAll('button'),function(button){
+ button.addEventListener('click',function(){
+  tier=Number(button.getAttribute('data-tier'));
+  Array.prototype.forEach.call(byId('tiers').querySelectorAll('button'),function(b){b.classList.toggle('active',b===button);});
+  render();
+ });
+});
+byId('basic').addEventListener('click',function(){mode='basic';byId('basic').classList.add('active');byId('advanced').classList.remove('active');render();});
+byId('advanced').addEventListener('click',function(){mode='advanced';byId('advanced').classList.add('active');byId('basic').classList.remove('active');render();});
+['core','useTokens','buyTokens','tokenPrice'].forEach(function(id){byId(id).addEventListener('input',render);byId(id).addEventListener('change',render);});
+byId('buyTokens').addEventListener('change',function(){byId('buyFields').classList.toggle('hidden',!byId('buyTokens').checked);});
+byId('tiers').querySelector('[data-tier="10"]').classList.add('active');
+render();
 })();
-</script></body></html>
+</script>
+</body></html>
