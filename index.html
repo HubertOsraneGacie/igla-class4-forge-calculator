@@ -66,7 +66,8 @@ function render(){
  var corePrice=Math.max(0,Number(byId('core').value)||0);
  var useTokens=byId('useTokens').checked;
  var buy=byId('buyTokens').checked;
- var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);\n var purchasedTokens=Math.max(0,Math.floor(Number(byId('tokenQty').value)||0));
+ var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);
+ var purchasedTokens=Math.max(0,Math.floor(Number(byId('tokenQty').value)||0));
  var forgeGross=0,forgeNet=0,cores=0,forgeTokenCount=0,forgeDiscount=0,rows=[];
  for(var i=1;i<=tier;i++){
   var operations=Math.pow(2,tier-i),cost=fusion[i-1],d=tokenDiscount(cost,useTokens);
@@ -80,7 +81,9 @@ function render(){
  var transferFull=transfer[tier-1],td=tokenDiscount(transferFull,useTokens);
  var fullTotal=forgeFull+transferFull,afterTokens=forgeAfter+td.net;
  var tokenCount=forgeTokenCount+td.count,discountTotal=fullTotal-afterTokens;
- var purchaseCost=buy?tokenCount*tokenPrice:0;
+ var paidTokenCount=buy?Math.min(tokenCount,purchasedTokens):0;
+ var freeTokenCount=Math.max(0,tokenCount-paidTokenCount);
+ var purchaseCost=paidTokenCount*tokenPrice;
  var actualTotal=afterTokens+purchaseCost,realSaving=fullTotal-actualTotal;
  byId('buyFields').classList.toggle('hidden',!buy);
  var html='';
@@ -91,7 +94,9 @@ function render(){
  html+=card('Łącznie — pełny koszt',money(fullTotal));
  html+=card('Łącznie — z Interim Tokens',money(afterTokens),'Bez ceny zakupu tokenów');
  if(buy){
-  html+=card('Kupione tokeny',paidTokenCount.toLocaleString('pl-PL'),'z '+tokenCount.toLocaleString('pl-PL')+' potrzebnych');\n  html+=card('Darmowe tokeny',freeTokenCount.toLocaleString('pl-PL'));\n  html+=card('Koszt zakupu tokenów',money(purchaseCost),paidTokenCount.toLocaleString('pl-PL')+' × '+gp(tokenPrice));
+  html+=card('Kupione tokeny',paidTokenCount.toLocaleString('pl-PL'),'z '+tokenCount.toLocaleString('pl-PL')+' potrzebnych');
+  html+=card('Darmowe tokeny',freeTokenCount.toLocaleString('pl-PL'));
+  html+=card('Koszt zakupu tokenów',money(purchaseCost),paidTokenCount.toLocaleString('pl-PL')+' × '+gp(tokenPrice));
   html+=card('Łącznie z zakupem tokenów',money(actualTotal));
   html+=card('Realna oszczędność',money(realSaving),tokenCount.toLocaleString('pl-PL')+' tokenów',realSaving>=0?'good':'bad');
  }else{
