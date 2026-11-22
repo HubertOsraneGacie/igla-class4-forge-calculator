@@ -38,6 +38,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:right;padding:8px 5px
 </div>
 <label for="core">Cena Exalted Core (gp)</label><input id="core" type="number" min="0" step="1000" value="400000">
 <label class="check"><input id="useTokens" type="checkbox" checked> Uwzględnij Interim Tokens</label>
+<label class="check"><input id="includeTransfer" type="checkbox" checked> Uwzględnij Convergence Transfer</label>
 <p class="hint">Token obniża koszt operacji o 250 000 gp, maksymalnie o 75% jej kosztu. Koszt Exalted Core nie jest obniżany.</p>
 <label class="check"><input id="buyTokens" type="checkbox"> Uwzględnij koszt zakupu Interim Tokens</label>
 <div id="buyFields" class="hidden"><label for="tokenQty">Ile Interim Tokens kupiłem?</label><input id="tokenQty" type="number" min="0" step="1" value="0"><label for="tokenPrice">Cena zakupu jednego tokena (gp)</label><input id="tokenPrice" type="number" min="0" step="1000" value="150000"><p class="hint">Pozostałe potrzebne tokeny traktowane są jako posiadane za darmo. Każdy token obniża koszt o 250 000 gp (z limitem 75% kosztu operacji).</p></div>
@@ -66,6 +67,7 @@ function render(){
  var corePrice=Math.max(0,Number(byId('core').value)||0);
  var useTokens=byId('useTokens').checked;
  var buy=byId('buyTokens').checked;
+ var includeTransfer=byId('includeTransfer').checked;
  var tokenPrice=Math.max(0,Number(byId('tokenPrice').value)||0);
  var purchasedTokens=Math.max(0,Math.floor(Number(byId('tokenQty').value)||0));
  var forgeGross=0,forgeNet=0,cores=0,forgeTokenCount=0,forgeDiscount=0,rows=[];
@@ -78,7 +80,8 @@ function render(){
  }
  var coreCost=cores*corePrice;
  var forgeFull=forgeGross+coreCost,forgeAfter=forgeNet+coreCost;
- var transferFull=transfer[tier-1],td=tokenDiscount(transferFull,useTokens);
+ var transferFull=includeTransfer?transfer[tier-1]:0;
+ var td=includeTransfer?tokenDiscount(transferFull,useTokens):{net:0,count:0,discount:0};
  var fullTotal=forgeFull+transferFull,afterTokens=forgeAfter+td.net;
  var tokenCount=forgeTokenCount+td.count,discountTotal=fullTotal-afterTokens;
  var paidTokenCount=buy?Math.min(tokenCount,purchasedTokens):0;
@@ -89,10 +92,12 @@ function render(){
  var html='';
  html+=card('Forge — pełny koszt',money(forgeFull));
  html+=card('Forge — z Interim Tokens',money(forgeAfter));
- html+=card('Convergence Transfer — pełny koszt',money(transferFull));
- html+=card('Convergence Transfer — z Interim Tokens',money(td.net));
- html+=card('Łącznie — pełny koszt',money(fullTotal));
- html+=card('Łącznie — z Interim Tokens',money(afterTokens),'Bez ceny zakupu tokenów');
+ if(includeTransfer){
+  html+=card('Convergence Transfer — pełny koszt',money(transferFull));
+  html+=card('Convergence Transfer — z Interim Tokens',money(td.net));
+ }
+ html+=card(includeTransfer?'Łącznie — pełny koszt':'Forge — pełny koszt',money(fullTotal));
+ html+=card(includeTransfer?'Łącznie — z Interim Tokens':'Forge — z Interim Tokens',money(afterTokens),'Bez ceny zakupu tokenów');
  if(buy){
   html+=card('Kupione tokeny',paidTokenCount.toLocaleString('pl-PL'),'z '+tokenCount.toLocaleString('pl-PL')+' potrzebnych');
   html+=card('Darmowe tokeny',freeTokenCount.toLocaleString('pl-PL'));
@@ -111,11 +116,10 @@ function render(){
  s+='<tr><td>Exalted Cores</td><td>'+cores+' × '+gp(corePrice)+' = '+money(coreCost)+'</td></tr>';
  s+='<tr><td>Forge — pełny koszt</td><td>'+money(forgeFull)+'</td></tr>';
  s+='<tr><td>Forge — z Interim Tokens</td><td>'+money(forgeAfter)+'</td></tr>';
- s+='<tr><td>Transfer — pełny koszt</td><td>'+money(transferFull)+'</td></tr>';
- s+='<tr><td>Transfer — z Interim Tokens</td><td>'+money(td.net)+'</td></tr>';
+ if(includeTransfer){s+='<tr><td>Transfer — pełny koszt</td><td>'+money(transferFull)+'</td></tr>';s+='<tr><td>Transfer — z Interim Tokens</td><td>'+money(td.net)+'</td></tr>';}
  s+='<tr><td>Liczba Interim Tokens</td><td>'+tokenCount+'</td></tr>';
- s+='<tr><td>Łącznie — pełny koszt</td><td>'+money(fullTotal)+'</td></tr>';
- s+='<tr><td>Łącznie — z Interim Tokens</td><td>'+money(afterTokens)+'</td></tr>';
+ s+='<tr><td>'+(includeTransfer?'Łącznie':'Forge')+' — pełny koszt</td><td>'+money(fullTotal)+'</td></tr>';
+ s+='<tr><td>'+(includeTransfer?'Łącznie':'Forge')+' — z Interim Tokens</td><td>'+money(afterTokens)+'</td></tr>';
  if(buy){s+='<tr><td>Kupione tokeny</td><td>'+paidTokenCount+' z '+tokenCount+'</td></tr><tr><td>Darmowe tokeny</td><td>'+freeTokenCount+'</td></tr><tr><td>Koszt zakupu tokenów</td><td>'+money(purchaseCost)+'</td></tr><tr><td>Łącznie z zakupem tokenów</td><td>'+money(actualTotal)+'</td></tr><tr><td>Realna oszczędność</td><td>'+money(realSaving)+'</td></tr>';}
  s+='</tbody></table></div>';
  byId('details').innerHTML=s;
@@ -129,7 +133,7 @@ Array.prototype.forEach.call(byId('tiers').querySelectorAll('button'),function(b
 });
 byId('basic').addEventListener('click',function(){mode='basic';byId('basic').classList.add('active');byId('advanced').classList.remove('active');render();});
 byId('advanced').addEventListener('click',function(){mode='advanced';byId('advanced').classList.add('active');byId('basic').classList.remove('active');render();});
-['core','useTokens','buyTokens','tokenPrice','tokenQty'].forEach(function(id){byId(id).addEventListener('input',render);byId(id).addEventListener('change',render);});
+['core','useTokens','includeTransfer','buyTokens','tokenPrice','tokenQty'].forEach(function(id){byId(id).addEventListener('input',render);byId(id).addEventListener('change',render);});
 byId('buyTokens').addEventListener('change',function(){byId('buyFields').classList.toggle('hidden',!byId('buyTokens').checked);});
 byId('tiers').querySelector('[data-tier="10"]').classList.add('active');
 render();
